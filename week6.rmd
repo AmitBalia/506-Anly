@@ -1,0 +1,161 @@
+---
+  title: "week 6"
+author: "Amit Balia"
+date: "7/28/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#Install nycflights13 and tidyverse library
+library(nycflights13)
+library(tidyverse)
+```
+
+```{r flights}
+#Filter data to see data only for july 23
+filter(flights, month == 7, day == 23)
+
+
+jul23 <- filter(flights, month == 7, day == 23)
+
+
+(oct8 <- filter(flights, month == 10, day == 8))
+
+#store value
+near(sqrt(2) ^ 2,  2)
+near(1 / 49 * 49, 1)
+
+#Filter for flights departed in July or objects
+filter(flights, month == 7 | month == 8)
+
+#filter for flights delayed by 2 or more hours
+filter(flights, !(arr_delay > 120 | dep_delay > 120))
+filter(flights, arr_delay <= 120, dep_delay <= 120)
+
+
+#filter with na
+df <- tibble(x = c(1, NA, 3))
+filter(df, x > 1)
+filter(df, is.na(x) | x > 1)
+
+#order by
+arrange(flights, month, day)
+
+# order by desc
+arrange(flights, desc(dep_delay))
+
+#sorting all the NA at the bottom:
+df <- tibble(x = c(5, 2, NA))
+arrange(df, x)
+arrange(df, desc(x))
+
+#Select all columns except those from year to day
+select(flights, -(year:day))
+
+#rename variables
+rename(flights, tail_num = tailnum)
+
+
+#add new columns
+flights_sml <- select(flights, 
+  year:day, 
+  ends_with("delay"), 
+  distance, 
+  air_time
+)
+mutate(flights_sml,
+  gain = dep_delay - arr_delay,
+  speed = distance / air_time * 60
+  )
+
+
+
+#summarise in one row
+summarise(flights, delay = mean(dep_delay, na.rm = TRUE))
+
+by_day <- group_by(flights, year, month, day)
+summarise(by_day, delay = mean(dep_delay, na.rm = TRUE))
+
+
+#If we dont set thena.rm argument, we get a lot of missing values and thus we should add an narm argument
+flights %>% 
+  group_by(year, month, day) %>% 
+  summarise(mean = mean(dep_delay, na.rm = TRUE))
+
+
+not_cancelled <- flights %>% 
+  filter(!is.na(dep_delay), !is.na(arr_delay))
+
+not_cancelled %>% 
+  group_by(year, month, day) %>% 
+  summarise(mean = mean(dep_delay))
+
+#use of count function to look at the planes that have the highest average delays:
+
+delays <- not_cancelled %>% 
+  group_by(tailnum) %>% 
+  summarise(
+    delay = mean(arr_delay)
+  )
+
+ggplot(data = delays, mapping = aes(x = delay)) + 
+  geom_freqpoly(binwidth = 10)
+
+
+delays <- not_cancelled %>% 
+  group_by(tailnum) %>% 
+  summarise(
+    delay = mean(arr_delay, na.rm = TRUE),
+    n = n()
+  )
+
+ggplot(data = delays, mapping = aes(x = n, y = delay)) + 
+  geom_point(alpha = 1/10)
+
+
+#Using Summary functions:
+not_cancelled %>% 
+  group_by(year, month, day) %>% 
+  summarise(
+    avg_delay1 = mean(arr_delay),
+    avg_delay2 = mean(arr_delay[arr_delay > 0]) # the average positive delay
+  )
+
+
+#findfirst flights leave each day?
+not_cancelled %>% 
+  group_by(year, month, day) %>% 
+  summarise(
+    first = min(dep_time))
+
+#last departure for each day:
+
+not_cancelled %>% 
+  group_by(year, month, day) %>% 
+  summarise(last_dep = last(dep_time))
+
+#group by multiple variables
+daily <- group_by(flights, year, month, day)
+(per_day   <- summarise(daily, flights = n()))
+(per_month <- summarise(per_day, flights = sum(flights)))
+(per_year  <- summarise(per_month, flights = sum(flights)))
+
+#Remove group
+daily %>% 
+  ungroup() %>%             # no longer grouped by date
+  summarise(flights = n())  # all flights
+
+
+flights_sml %>% 
+  group_by(year, month, day) %>%
+  filter(rank(desc(arr_delay)) < 10)
+
+#get groups bigger than a threshold:
+popular_dests <- flights %>% 
+  group_by(dest) %>% 
+  filter(n() > 365)
+popular_dests
+```
+
+

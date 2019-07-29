@@ -1,0 +1,120 @@
+---
+  title: "week 4"
+author: "Amit Balia"
+date: "7/28/2019"
+output: html_document
+---
+
+
+#sample matrices
+x <- 1:8
+y <- 9:12
+z <- 13:18
+
+cbind(x, y, z)
+
+#create matrix with x,y,z rows
+rbind(x, y, z)
+
+#convert number to characters
+cbind(c(1, 2, 3, 4, 5),c("A", "B", "C", "D", "D"))
+
+# matrix with 8 rows and 2 columns
+matrix(data = 1:10,nrow = 8,ncol = 2)
+
+# checking with 6 rows and 8 columns with integers
+matrix(data = 1:7,nrow = 6,ncol = 8)
+
+# 4 rows and 9 columns,fill by row instead of columns
+matrix(data = 1:15,nrow = 4,ncol = 9,byrow = TRUE)
+
+#create dataframe called survey data
+survey <- data.frame("index" = c(1, 2, 3, 4, 5),
+                     "sex" = c("m", "m", "none", "f", "f"),
+                     "age" = c(30,25,26,29,15))
+
+#viewing the dataaframe
+str(survey)
+
+# Create a dataframe of survey data removing factors
+survey <- data.frame("index" = c(1, 2, 3, 4, 5),
+                     "sex" = c("m", "m", "none", "f", "f"),
+                     "age" = c(50,40,55,34,44),
+                 stringsAsFactors = FALSE)
+#print output
+survey
+
+#output without factors
+str(survey)
+
+
+#checking head function that shows only head of the few rows
+head(ChickWeight)
+
+# checking tail() that shows shows the last few rows
+tail(ChickWeight)
+
+# view data frame in other window
+View(ChickWeight)
+
+#summary statists
+summary(ToothGrowth)
+
+# print summary toothgrowth
+str(ToothGrowth)
+
+#names of column ToothGrowth dataframe
+names(ToothGrowth)
+
+# Print the length column ToothGrowth
+ToothGrowth$len
+
+#mean length column ToothGrowth
+mean(ToothGrowth$len)
+
+# checking table ToothGrowth
+table(ToothGrowth$supp)
+
+# Print length AND supplement columns of ToothGrowth
+head(ToothGrowth[c("len", "supp")])
+
+#adding new columns
+survey <- data.frame("index" = c(1, 2, 43, 4, 5),
+                     "age" = c(39,33,35,68,15))
+#print new columns
+survey
+
+# adding new column sex to matrix
+survey$sex <- c("m", "m", "none", "f", "m")
+#print new column
+survey
+
+names
+# trying to change 1st column the name of dataframe
+names(survey)[1] <- "participant.number"
+
+#print output
+survey
+
+# trying to change 3rd  column the name of dataframe
+names(survey)[2] <- "b"
+
+#trying to Change the column name from age to age.year
+names(survey)[names(survey) == "age"] <- "year"
+
+#trying the slice the dataframes
+ToothGrowth[1:4, c(1,3)]
+
+
+# get entire 4th column
+ToothGrowth[, 4]
+
+#creating a new dataframe with rows of toothgrowth with supplement=VC
+ToothGrowth.VC <- ToothGrowth[ToothGrowth$supp == "VC", ]
+
+
+# filter for lenght less than 42 and dose greater than or equal to 1
+subset(x = ToothGrowth,subset = len < 42 & dose >= 1)
+
+# filtewr for lenght grater than 15 
+subset(x = ToothGrowth,subset = len > 15,select = c(len, dose))

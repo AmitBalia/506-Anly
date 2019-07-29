@@ -1,0 +1,84 @@
+---
+title: "Week11"
+author: "Amit Balia "
+date: "7/28/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+```{r setup, include=FALSE}
+#excluding the two categorical variables (vs and am) thus left with matrix of 9 columns and 32 rows, and we use prcomp
+mtcars.pca <- prcomp(mtcars[,c(1:7,10,11)], center = TRUE,scale. = TRUE)
+
+str(mtcars.pca)
+
+```
+
+```{r}
+#PLotting the PCA
+library(devtools)
+install_github("vqv/ggbiplot")
+
+library(ggbiplot)
+ggbiplot(mtcars.pca)
+
+#variables hp, cyl, and disp all contribute to PC1, with higher values in those variables moving the samples to the right on this plot.
+ggbiplot(mtcars.pca, labels=rownames(mtcars)) 
+
+```
+
+```{r}
+
+mtcars.country <- c(rep("Japan", 3), rep("US",4), rep("Europe", 7),rep("US",3), "Europe", rep("Japan", 3), rep("US",4), rep("Europe", 3), "US", rep("Europe", 3))
+
+ggbiplot(mtcars.pca,ellipse=TRUE,  labels=rownames(mtcars), groups=mtcars.country)
+ggbiplot(mtcars.pca,ellipse=TRUE,choices=c(3,4),   labels=rownames(mtcars), groups=mtcars.country)
+
+```
+
+```{r}
+#ggbiplot
+#using  the circle argument:
+
+ggbiplot(mtcars.pca,ellipse=TRUE,circle=TRUE, labels=rownames(mtcars), groups=mtcars.country)
+
+#we use the obs.scale 
+
+ggbiplot(mtcars.pca,ellipse=TRUE,obs.scale = 1, var.scale = 1,  labels=rownames(mtcars), groups=mtcars.country)
+```
+
+```{r}
+#Customer my ggbiplot including ggtitle() & scale_colour_manual() and moving legend with theme()
+
+
+ggbiplot(mtcars.pca,ellipse=TRUE,obs.scale = 1, var.scale = 1,  labels=rownames(mtcars), groups=mtcars.country) +
+  scale_colour_manual(name="Origin", values= c("pink", "Forest green", "light blue"))+
+  ggtitle("PCA - mtcars dataset")+
+  theme_minimal()+
+  theme(legend.position = "left") 
+```
+
+
+```{r}
+# Scaling values for spacecar in relation to thePCA's center and applying rotation  of the PCA Matrix, after  that using rbind()  
+
+s.sc <- scale(t(spacecar[c(1:7,10,11)]), center= mtcars.pca$center)
+s.pred <- s.sc %*% mtcars.pca$rotation
+
+
+mtcars.plusproj.pca <- mtcars.pca
+mtcars.plusproj.pca$x <- rbind(mtcars.plusproj.pca$x, s.pred)
+
+
+ggbiplot(mtcars.plusproj.pca, obs.scale = 1, var.scale = 1, ellipse = TRUE, circle = FALSE, var.axes=TRUE, labels=c(rownames(mtcars), "spacecar"), groups=mtcars.countryplus)+
+  scale_colour_manual(name="Origin", values= c("forest green", "red3", "pink", "light blue"))+
+  ggtitle("PCA of mtcars dataset with extra sample projected 'Jupiter")+
+  theme_minimal()+
+  theme(legend.position = "right")
+
+```
